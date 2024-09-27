@@ -156,6 +156,17 @@
 						fadeOut('preload', 'ingame');
 						fadeOut('instructions', null, true);
 						gba.runStable();
+						setTimeout(() => {
+							const keyboardEvent = new KeyboardEvent('keydown', {
+								key: 'z',
+								code: 'KeyZ',
+								keyCode: 90, // ASCII code for 'z'
+								which: 90, // ASCII code for 'z'
+								bubbles: true,
+								cancelable: true
+							});
+							document.dispatchEvent(keyboardEvent);
+						}, 1000);
 					} else {
 						load.textContent = 'FAILED';
 						setTimeout(function () {
@@ -514,7 +525,8 @@
 		</footer>
 
 		<script>
-			const baseUrl = window.location.pathname;
+			let baseUrl = window.location.pathname;
+			baseUrl = baseUrl === "/" ? "" : baseUrl;
 			fetch(`${baseUrl}/resources/untitled-adventure.sav`)
 				.then((res) => res.blob()) // Gets the response and returns it as a blob
 				.then((blob) => {
