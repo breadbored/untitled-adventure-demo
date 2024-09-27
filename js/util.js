@@ -249,6 +249,7 @@ class Serializer {
 			canvas.setAttribute("height", image.height);
 			canvas.setAttribute("width", image.width);
 			var context = canvas.getContext("2d");
+			context.imageSmoothingEnabled = true;
 			context.drawImage(image, 0, 0);
 			var pixels = context.getImageData(
 				0,

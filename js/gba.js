@@ -83,6 +83,7 @@ class GameBoyAdvance {
 			this.targetCanvas = canvas;
 			this.setCanvasDirect(this.indirectCanvas);
 			var targetContext = canvas.getContext("2d");
+			targetContext.imageSmoothingEnabled = false;
 			this.video.drawCallback = function () {
 				targetContext.drawImage(
 					self.indirectCanvas,

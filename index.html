@@ -1,7 +1,8 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>gbajs2</title>
+		<meta name="viewport" content="target-densitydpi=device-dpi" />
+		<title>Untitled Adventure gbajs2</title>
 		<link rel="stylesheet" href="resources/main.css" />
 		<script src="js/util.js"></script>
 		<script src="js/core.js"></script>
@@ -23,6 +24,16 @@
 		<script src="resources/biosbin.js"></script>
 
 		<script>
+			// Calculate screen size to estimate the correct dimensions for a realistic GBA screen
+			let dpi_x;
+			let dpi_y;
+			let width_inches;
+			let height_inches;
+			// The GBA is 1.61 in × 2.41 in, so we need to scale the screen to fit that size
+			let scale;
+			let pixel_width;
+			let pixel_height;
+
 			let gba;
 			let runCommands = [];
 			let debug = null;
@@ -73,6 +84,20 @@
 						let pixelatedBox = document.getElementById('pixelated');
 						pixelatedBox.parentElement.removeChild(pixelatedBox);
 					}
+
+					// Calculate screen size to estimate the correct dimensions for a realistic GBA screen
+					dpi_x = document.getElementById('dpi').offsetWidth;
+					dpi_y = document.getElementById('dpi').offsetHeight;
+					width_inches = screen.width / dpi_x;
+					height_inches = screen.height / dpi_y;
+					// The GBA is 1.61 in × 2.41 in, so we need to scale the screen to fit that size
+					scale = Math.min(width_inches / 2.41, height_inches / 1.61);
+					pixel_width = 240 * scale;
+					pixel_height = 160 * scale;
+					document.getElementById('screen').style.width =
+						scale / 2.41 + 'in';
+					document.getElementById('screen').style.height =
+						scale / 1.61 + 'in';
 				} else {
 					let dead = document.getElementById('controls');
 					dead.parentElement.removeChild(dead);
@@ -112,6 +137,9 @@
 			}
 
 			function run(file) {
+				let screen = document.getElementById('screen');
+				screen.style.width = scale / 1.61 + 'in';
+				screen.style.height = scale / 2.41 + 'in';
 				let dead = document.getElementById('loader');
 				dead.value = '';
 				let load = document.getElementById('select');
@@ -148,7 +176,7 @@
 				let crash = document.getElementById('crash');
 				if (crash) {
 					let context = gba.targetCanvas.getContext('2d');
-					context.clearRect(0, 0, 480, 320);
+					context.clearRect(0, 0, pixel_width * 3, pixel_height * 3);
 					gba.video.drawCallback();
 					crash.parentElement.removeChild(crash);
 					let canvas = document.getElementById('screen');
@@ -195,9 +223,9 @@
 				let canvas = gba.indirectCanvas;
 				let data = canvas.toDataURL('image/png');
 				let image = new Image();
-        image.src = data;
-        let w = window.open("");
-        w.document.write(image.outerHTML);
+				image.src = data;
+				let w = window.open('');
+				w.document.write(image.outerHTML);
 			}
 
 			function lcdFade(context, target, callback) {
@@ -223,7 +251,7 @@
 						}
 					}
 					context.putImageData(pixelData, 0, 0);
-					target.clearRect(0, 0, 480, 320);
+					target.clearRect(0, 0, pixel_width * 3, pixel_height * 3);
 					if (i > 40) {
 						clearInterval(drawInterval);
 					} else {
@@ -234,12 +262,6 @@
 
 			function setVolume(value) {
 				gba.audio.masterVolume = Math.pow(2, value) - 1;
-			}
-
-			function setPixelated(pixelated) {
-				let screen = document.getElementById('screen');
-				let context = screen.getContext('2d');
-				context.imageSmoothingEnabled = !pixelated;
 			}
 
 			function enableDebug() {
@@ -295,8 +317,8 @@
 						);
 						canvas.setAttribute('style', 'margin: 0');
 					} else {
-						canvas.setAttribute('height', 320);
-						canvas.setAttribute('width', 480);
+						canvas.setAttribute('height', pixel_height * 3);
+						canvas.setAttribute('width', pixel_width * 3);
 						canvas.removeAttribute('style');
 					}
 				},
@@ -309,8 +331,8 @@
 		</script>
 	</head>
 	<body>
-		<canvas id="screen" width="480" height="320"></canvas>
-		<section id="gameinfo">
+		<canvas id="screen" width="1440" height="960"></canvas>
+		<!-- <section id="gameinfo">
 			<p>The Game Boy Advance's buttons are mapped as follows:</p>
 			<table id="mapping">
 				<tr>
@@ -354,8 +376,8 @@
 					<td>\</td>
 				</tr>
 			</table>
-		</section>
-		<section id="controls">
+		</section> -->
+		<section id="controls" style="display: none; width: 0; height: 0">
 			<div id="preload">
 				<button
 					class="bigbutton"
@@ -415,7 +437,7 @@
 				<p id="openDebug" onclick="enableDebug()">Debugger</p>
 			</div>
 		</section>
-		<section id="instructions">
+		<!-- <section id="instructions">
 			<p>
 				For legal reasons, GBA.js is presented without any included
 				games. Please click Select below to choose a Game Boy Advance
@@ -428,9 +450,80 @@
 				can be found on the sidebar. If you're feeling daring, please
 				submit problem reports to the GitHub page.
 			</p>
-		</section>
-		<footer style="float: left">
-			© 2012 – 2013 <a href="http://endrift.com/">Endrift</a>
+		</section> -->
+
+		<!-- Control Map -->
+		<table style="position: absolute; bottom: 60px; min-width: 30%; left: 50%; transform: translateX(-50%);">
+			<tr>
+				<td>Up</td>
+				<td>Up</td>
+			</tr>
+			<tr>
+				<td>Down</td>
+				<td>Down</td>
+			</tr>
+			<tr>
+				<td>Left</td>
+				<td>Left</td>
+			</tr>
+			<tr>
+				<td>Right</td>
+				<td>Right</td>
+			</tr>
+			<tr>
+				<td>A</td>
+				<td>Z</td>
+			</tr>
+			<tr>
+				<td>B</td>
+				<td>X</td>
+			</tr>
+			<tr>
+				<td>L</td>
+				<td>A</td>
+			</tr>
+			<tr>
+				<td>R</td>
+				<td>S</td>
+			</tr>
+			<tr>
+				<td>Start</td>
+				<td>Enter</td>
+			</tr>
+			<tr>
+				<td>Select</td>
+				<td>\</td>
+			</tr>
+		</table>
+
+		<div
+			id="dpi"
+			style="
+				height: 1in;
+				width: 1in;
+				left: 100%;
+				position: fixed;
+				top: 100%;
+			"
+		></div>
+		<footer style="position: absolute; bottom: 10px; left: 10px">
+			GBAJS © 2012 – 2013 <a href="http://endrift.com/">Endrift</a>
+			<br />
+			Untitled Adventure ROM © 2024
+			<a href="https://bread.codes/">BreadCodes</a>
 		</footer>
+
+		<script>
+			fetch('/resources/untitled-adventure.sav')
+				.then((res) => res.blob()) // Gets the response and returns it as a blob
+				.then((blob) => {
+					uploadSavedataPending(blob);
+					fetch('/resources/untitled-adventure.gba')
+						.then((res) => res.blob()) // Gets the response and returns it as a blob
+						.then((blob) => {
+							run(blob);
+						});
+				});
+		</script>
 	</body>
 </html>
