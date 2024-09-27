@@ -514,11 +514,12 @@
 		</footer>
 
 		<script>
-			fetch('/resources/untitled-adventure.sav')
+			const baseUrl = window.location.pathname;
+			fetch(`${baseUrl}/resources/untitled-adventure.sav`)
 				.then((res) => res.blob()) // Gets the response and returns it as a blob
 				.then((blob) => {
 					uploadSavedataPending(blob);
-					fetch('/resources/untitled-adventure.gba')
+					fetch(`${baseUrl}/resources/untitled-adventure.gba`)
 						.then((res) => res.blob()) // Gets the response and returns it as a blob
 						.then((blob) => {
 							run(blob);
